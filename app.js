@@ -1,6 +1,7 @@
 /*Importation express en créant une const express */
 const express = require('express');
 const bodyParser = require('body-parser');
+const path = require('path');
 
 /* Importation de Mongoose dans app.js*/
 const mongoose = require('mongoose');
@@ -33,6 +34,8 @@ app.use(bodyParser.json());
 
 app.use('/api/sauces', SaucesRoutes);
 app.use('/api/auth', userRoutes);
+app.use('/images', express.static(path.join(__dirname, 'images')));/* Configuration du serveur 
+pr renvoyer des fichiers statiques pr une route donnée avec  express.static()  et  path.join().*/
 
   
 /*Puis on exporte cette app/const pr qu'on puisse y accéder depuis d'autres 

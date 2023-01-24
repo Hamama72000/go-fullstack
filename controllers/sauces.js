@@ -1,14 +1,18 @@
 const Sauce = require('../models/Sauces');
 
 exports.createSauce = (req, res, next) => {
-    delete req.body._id; // on enleve le champ id du corps de la requête
+    const sauceObject = JSON.parse(req.body.sauce);// on parse lobjet
+    delete sauceObject._id; // on enleve le champ id du corps de la requête
+    delete sauceObject._userId;//on utilise luserId du token
     const sauce = new Sauce({
-      //création d'1 instance de modèle sauces en lui passant un objet JavaScript contenant ttes les infos requises du corps de requête analysé (en ayant supprimé en amont le faux_id envoyé par le front-end
-      ...req.body, //L'opérateur spread ... est utilisé pour faire une copie de tous les éléments de req.body
+      //création d'1 instance de modèle sauces en lui passant 1objet JS contenant ttes les infos requises du corps de requête analysé (en ayant supprimé en amont le faux_id envoyé par le front-end
+      ...sauceObject, //L'opérateur spread ... est utilisé pr faire 1copie de tS les éléments de req.body
+      userID: req.auth.userID, 
+      imageURL: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
     });
-    // Pour enregistrer dans la base de données on appelle la méthode save et on retourne une promesse
+    // Pr enregistrer ds la base de données on appelle la méthode save et on retourne 1promesse
     sauce.save()
-      .then(() => res.status(201).json({ message: "Sauce enregistrée !" })) //on renvoie une réponse de réussite ac un code 201 de réussite
+      .then(() => res.status(201).json({ message: "Sauce enregistrée !" })) //on renvoie 1réponse de réussite ac un code 201 de réussite
       .catch((error) => res.status(400).json({ error })); // renvoie réponse ac erreur générée par Mongoose ainsi qu'un code d'erreur 400
 };
 
