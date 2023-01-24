@@ -1,4 +1,5 @@
 const Sauce = require('../models/Sauces');
+const fs = require('fs');
 
 exports.createSauce = (req, res, next) => {
     const sauceObject = JSON.parse(req.body.sauce);// on parse lobjet
@@ -23,9 +24,22 @@ exports.modifySauce = (req, res, next) => {
 };
 
 exports.deleteSauce = (req, res, next) => {
-    Sauce.deleteOne({ _id: req.params.id })
-      .then(() => res.status(200).json({ message: "Sauce supprimée !" }))
-      .catch((error) => res.status(400).json({ error }));
+  Sauce.findOne({ _id: req.params.id})//Ns utilisons l'ID que ns recevons comme paramètre pr accéder à la Sauce correspondante ds la base de données.
+      .then(sauce => {
+          if (sauce.userId != req.auth.userId) {
+              res.status(401).json({message: 'Not authorized'});
+          } else {
+              const filename = sauce.imageUrl.split('/images/')[1];//Ns utilisons le fait de savoir que notre URL d'image contient 1segment /images/ pr séparer le nom de fichier.
+              fs.unlink(`images/${filename}`, () => { //Ns utilisons ensuite la fonction unlink du package fs pr supprimer ce fichier, en lui passant le fichier à supprimer et le callback à exécuter 1fois ce fichier supprimé.
+                  Sauce.deleteOne({_id: req.params.id})//Ds le callback, ns implémentons la logique d'origine en supprimant la Sauce de la base de données.
+                      .then(() => { res.status(200).json({message: 'Sauce supprimée !'})})
+                      .catch(error => res.status(401).json({ error }));
+              });
+          }
+      })
+      .catch( error => {
+          res.status(500).json({ error });
+      });
 };
 
 exports.getOneSauce = (req, res, next) => {
