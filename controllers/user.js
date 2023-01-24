@@ -6,7 +6,7 @@ const bcrypt = require("bcrypt");
 const jwt = require('jsonwebtoken');
 
 //pour la création des middelwares on a besoin des users
-const User = require("../models/User");
+const User = require("../models/User"); 
 
 //Pour la création de nx users
 exports.signup = (req, res, next) => {
@@ -22,8 +22,12 @@ exports.signup = (req, res, next) => {
         .then(() => res.status(201).json({ message: "Utilisateur créé !" }))
         .catch((error) => res.status(400).json({ error }));
     })
-    .catch((error) => res.status(500).json({ error }));
-};
+    
+    .catch((error) => {
+      console.log("----------->error1", error);
+      res.status(500).json({ error });
+    }
+)};
 
 exports.login = (req, res, next) => {
   User.findOne({ email: req.body.email })
