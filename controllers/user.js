@@ -1,33 +1,40 @@
 /*importation de bcrypt pour le cryptage. La méthode  hash()  de bcrypt crée un hash crypté des mots 
 de passe des utilisateurs pr les enregistrer de manière sécurisée ds la base de données.*/
-
 const bcrypt = require("bcrypt");
 
 const jwt = require('jsonwebtoken');
+const secret = process.env.TOKKEN;
 
 //pour la création des middelwares on a besoin des users
 const User = require("../models/User"); 
 
+const validator = require('email-validator');
+
+
 //Pour la création de nx users
 exports.signup = (req, res, next) => {
-  bcrypt
-    .hash(req.body.password, 10) //fonction de hachage on demande de « saler » le mot de passe 10 fois. + la valeur est élevée, + l'exécution de la fonction sera longue, et + le hachage sera sécurisé.
-    .then((hash) => {
-      const user = new User({
-        email: req.body.email,
-        password: hash,
-      });
-      user
-        .save()
-        .then(() => res.status(201).json({ message: "Utilisateur créé !" }))
-        .catch((error) => res.status(400).json({ error }));
-    })
-    
-    .catch((error) => {
-      console.log("----------->error1", error);
-      res.status(500).json({ error });
-    }
-)};
+  let email = validator.validate(req.body.email);
+  if (email==true){  
+    bcrypt
+      .hash(req.body.password, 10) //fonction de hachage on demande de « saler » le mot de passe 10 fois. + la valeur est élevée, + l'exécution de la fonction sera longue, et + le hachage sera sécurisé.
+      .then((hash) => {
+        const user = new User({
+          email: req.body.email,
+          password: hash,
+        });
+        user
+          .save()
+          .then(() => res.status(201).json({ message: "Utilisateur créé !" }))
+          .catch((error) => res.status(400).json({ error }));
+      })
+      
+      .catch((error) => {
+        console.log("----------->error1", error);
+        res.status(500).json({ error });
+      })
+ 
+  }else{res.status(500).json({ message: "adresse email invalide!" });
+  }};
 
 exports.login = (req, res, next) => {
   User.findOne({ email: req.body.email })
@@ -45,7 +52,7 @@ exports.login = (req, res, next) => {
             userId: user._id,
             token: jwt.sign(
                 { userId: user._id },
-                'RANDOM_TOKEN_SECRET',
+                secret,
                 { expiresIn: '24h' }
             )
         });

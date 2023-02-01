@@ -19,10 +19,12 @@ router.post('/', auth, multer, SaucesCtrl.createSauce);
 router.get("/:id", auth, SaucesCtrl.getOneSauce);
 
 //Methode put pour mettre à jour une sauce
-router.put("/:id", auth, SaucesCtrl.modifySauce);
+router.put("/:id", auth, multer, SaucesCtrl.modifySauce);
 
 //Route pour supprimer un objet
 router.delete("/:id", auth, SaucesCtrl.deleteSauce);
+
+router.post('/:id/like', auth, SaucesCtrl.likeSauce);
 
 
 module.exports = router;

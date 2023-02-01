@@ -1,3 +1,5 @@
+const dotenv = require("dotenv").config();
+
 /*Importation express en créant une const express */
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -8,8 +10,10 @@ const mongoose = require('mongoose');
 const SaucesRoutes = require('./routes/sauces');
 const userRoutes = require('./routes/user');
 
+const connect = process.env.ADDRESSMONGO
+
 mongoose.set('strictQuery', false);
-mongoose.connect('mongodb+srv://maya7223:Algerie72000@cluster0.grbdexh.mongodb.net/?retryWrites=true&w=majority',
+mongoose.connect(connect,
   { useNewUrlParser: true,
     useUnifiedTopology: true,
   })
