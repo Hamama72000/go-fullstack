@@ -78,8 +78,10 @@ exports.getAllSauces = (req, res, next) => {
 exports.likeSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id }) //pour récupérer la sauce spécifique que l'on veut mettre à jour
     .then((sauce) => {
+      console.log('--> body', req.body, sauce.usersDisliked.includes(req.body.userId))
       // quand on ajoute 1 like
       if (!sauce.usersLiked.includes(req.body.userId) && req.body.like === 1) {
+        console.log('--> 1')
         //'include' permet de verifier qu'une même utilisteur ne like pas plusieurs fois la même sauce
         Sauce.updateOne({ _id: req.params.id }, { $inc: { likes: 1 }  })
           .then(() => res.status(200).json({ message: "sauce likée!" }))
@@ -89,6 +91,8 @@ exports.likeSauce = (req, res, next) => {
 
       // like neutre = 0 (quand on enlève son like)
       if (sauce.usersLiked.includes(req.body.userId) && req.body.like === 0) {
+        console.log('--> 2')
+
         //'include' permet de verifier qu'une même utilisteur ne like pas plusieurs fois la même sauce
         Sauce.updateOne(
           { _id: req.params.id },
@@ -100,7 +104,9 @@ exports.likeSauce = (req, res, next) => {
       }
 
       // like= -1
-      if (!sauce.usersDisliked.includes(req.body.userId) && req.body.dislikes === -1) {
+      if (!sauce.usersDisliked.includes(req.body.userId) && req.body.like === -1) {
+        console.log('--> 3')
+
         Sauce.updateOne(
           { _id: req.params.id },
           { $inc: { dislikes: 1 }, $push: { usersDisliked: req.body.userId } } // on incremente à -1 donc on revient à 0, pull permet de retirer le userId du tabeau
@@ -112,6 +118,8 @@ exports.likeSauce = (req, res, next) => {
 
       // Dislike neutre (quand on retire le dislike)
       if (sauce.usersDisliked.includes(req.body.userId) && req.body.like === 0) {
+        console.log('--> 4')
+
         //'include' permet de verifier qu'une même utilisteur ne like pas plusieurs fois la même sauce
         Sauce.updateOne(
           { _id: req.params.id },
