@@ -78,12 +78,12 @@ exports.getAllSauces = (req, res, next) => {
 exports.likeSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id }) //pour récupérer la sauce spécifique que l'on veut mettre à jour
     .then((sauce) => {
-      console.log('--> body', req.body, sauce.usersDisliked.includes(req.body.userId))
+      console.log('--> body', req.body, sauce.usersLiked.includes(req.body.userId))
       // quand on ajoute 1 like
       if (!sauce.usersLiked.includes(req.body.userId) && req.body.like === 1) {
         console.log('--> 1')
         //'include' permet de verifier qu'une même utilisteur ne like pas plusieurs fois la même sauce
-        Sauce.updateOne({ _id: req.params.id }, { $inc: { likes: 1 }  })
+        Sauce.updateOne({ _id: req.params.id }, { $inc: { likes: 1 }, $push: { usersLiked: req.body.userId }  })
           .then(() => res.status(200).json({ message: "sauce likée!" }))
           .catch((error) => res.status(400).json({ zzz: "eee",sauce, error }));
         return
