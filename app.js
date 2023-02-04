@@ -7,11 +7,14 @@ const path = require('path');
 
 /* Importation de Mongoose dans app.js*/
 const mongoose = require('mongoose');
+const mongodbErrorHandler = require('mongoose-mongodb-errors')
+
 const SaucesRoutes = require('./routes/sauces');
 const userRoutes = require('./routes/user');
 
 const connect = process.env.ADDRESSMONGO
 
+mongoose.plugin(mongodbErrorHandler);
 mongoose.set('strictQuery', false);
 mongoose.connect(connect,
   { useNewUrlParser: true,
